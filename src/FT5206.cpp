@@ -64,6 +64,14 @@ TP_Point FT5206_Class::getPoint(uint8_t num)
     }
 }
 
+uint8_t FT5206_Class::touched()
+{
+    if (!_init)return 0;
+    uint8_t val = 0;
+    _readByte(FT5206_TOUCHES_REG,1,&val);
+    return val > 2 ? 0: val;
+}
+
 void FT5206_Class::enterSleepMode()
 {
     if (!_init)return;
