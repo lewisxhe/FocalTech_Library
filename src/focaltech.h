@@ -95,7 +95,7 @@ public:
     void    disableINT(void);
 
     bool    getPoint(uint16_t &x, uint16_t &y);
-    bool    getPoint(uint8_t num = 0);
+    bool    getPoint(uint8_t *x, uint8_t *y);
 
     uint8_t getTouched(void);
 

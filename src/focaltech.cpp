@@ -241,36 +241,27 @@ uint8_t FT5206_Class::getErrorCode(void)
     return readRegister8(FOCALTECH_REGISTER_ERROR_STATUS);
 }
 
-bool FT5206_Class::getPoint(uint8_t num)
+bool FT5206_Class::getPoint(uint8_t *x, uint8_t *y)
 {
-    if (!initialization) {
+    if (!initialization || x == nullptr || y == nullptr) {
         return false;
     }
-    uint16_t _x[2];
-    uint16_t _y[2];
-    uint16_t _id[2];
-    uint8_t _touches = 0;
-    uint8_t _data[16];
-    readBytes(FOCALTECH_REGISTER_MODE, _data, 16);
-    _touches = _data[FOCALTECH_REGISTER_STATUS];
-    if ((_touches > 2) || (_touches == 0)) {
-        _touches = 0;
-        return;
+    // uint16_t _id[2];
+    uint8_t buffer[16];
+    readBytes(FOCALTECH_REGISTER_MODE, buffer, 16);
+    if (buffer[FOCALTECH_REGISTER_STATUS] == 0) {
+        return false;
     }
     for (uint8_t i = 0; i < 2; i++) {
-        _x[i] = _data[FOCALTECH_REGISTER_TOUCH1_XH + i * 6] & 0x0F;
-        _x[i] <<= 8;
-        _x[i] |= _data[FOCALTECH_REGISTER_TOUCH1_XL + i * 6];
-        _y[i] = _data[FOCALTECH_REGISTER_TOUCH1_YH + i * 6] & 0x0F;
-        _y[i] <<= 8;
-        _y[i] |= _data[FOCALTECH_REGISTER_TOUCH1_YL + i * 6];
-        _id[i] = _data[FOCALTECH_REGISTER_TOUCH1_YH + i * 6] >> 4;
+        x[i] = buffer[FOCALTECH_REGISTER_TOUCH1_XH + i * 6] & 0x0F;
+        x[i] <<= 8;
+        x[i] |= buffer[FOCALTECH_REGISTER_TOUCH1_XL + i * 6];
+        y[i] = buffer[FOCALTECH_REGISTER_TOUCH1_YH + i * 6] & 0x0F;
+        y[i] <<= 8;
+        y[i] |= buffer[FOCALTECH_REGISTER_TOUCH1_YL + i * 6];
+        // _id[i] = buffer[FOCALTECH_REGISTER_TOUCH1_YH + i * 6] >> 4;
     }
-    if ((_touches == 0) || (num > 1)) {
-        return false;
-    } else {
-        return true;
-    }
+    return true;
 }
 
 uint8_t FT5206_Class::readRegister8(uint8_t reg)
