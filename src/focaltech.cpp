@@ -59,9 +59,12 @@ bool FT5206_Class::probe(void)
 {
 #ifdef ARDUINO
     _i2cPort->beginTransmission(_address);
-    return _i2cPort->endTransmission() == 0;
-#endif
+    if (_i2cPort->endTransmission() == 0) {
+        initialization = true;
+    }
+#else
     initialization = true;
+#endif
     return true;
 }
 
