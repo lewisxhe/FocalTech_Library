@@ -74,7 +74,7 @@ bool FT5206_Class::begin(TwoWire &port, uint8_t addr)
     _address = addr;
     _readCallbackFunc = nullptr;
     _writeCallbackFunc = nullptr;
-    return true;
+    return probe();
 }
 
 bool FT5206_Class::begin(iic_com_fptr_t read_cb, iic_com_fptr_t write_cb, uint8_t addr)
