@@ -22,9 +22,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-focaltech.h - Arduino library for focaltech chip.
+focaltech.h - Arduino library for focaltech chip , support FT5206,FT6236,FT5336,FT6436L,FT6436
 Created by Lewis on April 17, 2019.
-github:https://github.com/lewisxhe/FT5206_Library
+github:https://github.com/lewisxhe/FocalTech_Library
 */
 /////////////////////////////////////////////////////////////////
 #pragma once
@@ -37,7 +37,7 @@ github:https://github.com/lewisxhe/FT5206_Library
 #include <string.h>
 #endif
 
-#define FT5206_SLAVE_ADDRESS    (0x38)
+#define FOCALTECH_SLAVE_ADDRESS    (0x38)
 
 typedef enum {
     FOCALTECH_NO_GESTRUE,
@@ -57,22 +57,22 @@ typedef enum {
 } EventFlag_t;
 
 typedef enum {
-    FOCALTECH_PMODE_ACTIVE = 0,
-    FOCALTECH_PMODE_MONITOR = 1,
-    FOCALTECH_PMODE_DEEPSLEEP = 3,
+    FOCALTECH_PMODE_ACTIVE = 0,         // ~4mA
+    FOCALTECH_PMODE_MONITOR = 1,        // ~3mA
+    FOCALTECH_PMODE_DEEPSLEEP = 3,      // ~100uA  The reset pin must be pulled down to wake up
 } PowerMode_t;
 
 
-class FT5206_Class
+class FocalTech_Class
 {
 public:
     typedef uint8_t (*iic_com_fptr_t)(uint8_t dev_addr, uint8_t reg_addr, uint8_t *data, uint8_t len);
 
 #ifdef ARDUINO
-    bool begin(TwoWire &port = Wire, uint8_t addr = FT5206_SLAVE_ADDRESS);
+    bool begin(TwoWire &port = Wire, uint8_t addr = FOCALTECH_SLAVE_ADDRESS);
 #endif
 
-    bool begin(iic_com_fptr_t read_cb, iic_com_fptr_t write_cb, uint8_t addr = FT5206_SLAVE_ADDRESS);
+    bool begin(iic_com_fptr_t read_cb, iic_com_fptr_t write_cb, uint8_t addr = FOCALTECH_SLAVE_ADDRESS);
 
     void    setTheshold(uint8_t value);
     uint8_t getThreshold(void);
@@ -95,7 +95,7 @@ public:
     void    disableINT(void);
 
     bool    getPoint(uint16_t &x, uint16_t &y);
-    bool    getPoint(uint8_t *x, uint8_t *y);
+    // bool    getPoint(uint8_t *x, uint8_t *y);
 
     uint8_t getTouched(void);
 
