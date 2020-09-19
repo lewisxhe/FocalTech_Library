@@ -38,6 +38,7 @@ github:https://github.com/lewisxhe/FocalTech_Library
 #endif
 
 #define FOCALTECH_SLAVE_ADDRESS    (0x38)
+#define GT9XX_SLAVE_ADDRESS        (0x14)
 
 typedef enum {
     FOCALTECH_NO_GESTRUE,
@@ -62,11 +63,53 @@ typedef enum {
     FOCALTECH_PMODE_DEEPSLEEP = 3,      // ~100uA  The reset pin must be pulled down to wake up
 } PowerMode_t;
 
+typedef uint8_t (*iic_com_fptr_t)(uint8_t dev_addr, uint16_t reg_addr, uint8_t *data, uint8_t len);
+
+
+class GT9xx_Class
+{
+public:
+#ifdef ARDUINO
+    bool begin(TwoWire &port = Wire, uint8_t addr = GT9XX_SLAVE_ADDRESS);
+#endif
+    bool begin(iic_com_fptr_t read_cb, iic_com_fptr_t write_cb, uint8_t addr = GT9XX_SLAVE_ADDRESS);
+
+    void softReset(void);
+    void setPins(int rst, int interrupt);
+
+    uint8_t scanPoint();
+    void  getPoint(uint16_t &x, uint16_t &y, uint8_t index);
+private:
+
+    typedef struct {
+        uint16_t x;
+        uint16_t y;
+    } GT9xx_t;
+
+    bool probe(void);
+
+    uint8_t readRegister( uint16_t reg);
+    void writeRegister( uint16_t reg, uint8_t value);
+    bool readBytes( uint16_t reg, uint8_t *data, int nbytes);
+    bool writeBytes( uint16_t reg, uint8_t *data, int nbytes);
+
+    GT9xx_t data[5];
+    uint8_t _address;
+    bool initialization = false;
+    iic_com_fptr_t _readCallbackFunc = nullptr;
+    iic_com_fptr_t _writeCallbackFunc = nullptr;
+    int _rst = -1;
+    int _interrupt = -1;
+#ifdef ARDUINO
+    TwoWire *_i2cPort;
+#endif
+};
+
+
 
 class FocalTech_Class
 {
 public:
-    typedef uint8_t (*iic_com_fptr_t)(uint8_t dev_addr, uint8_t reg_addr, uint8_t *data, uint8_t len);
 
 #ifdef ARDUINO
     bool begin(TwoWire &port = Wire, uint8_t addr = FOCALTECH_SLAVE_ADDRESS);
